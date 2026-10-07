@@ -1,0 +1,120 @@
+{% extends "reports/base.html" %}
+{% block title %}{{ title }} — CrimeReport Portal{% endblock %}
+
+{% block content %}
+<div class="narrow" style="max-width:820px;">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Your report goes to the police. You will get a tracking number after you submit.</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'dashboard' %}" class="btn btn-outline">Back to dashboard</a>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="stack">
+  {% csrf_token %}
+
+  <div class="card">
+    <label class="checkbox-row">
+      {{ form.is_anonymous }}
+      <div>
+        <strong>Submit anonymously</strong>
+        <span>Your name will not be attached to this report. Keep the report ID you receive so you can track it later.</span>
+      </div>
+    </label>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Incident details</h2>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.crime_type.id_for_label }}">Crime type</label>
+      {{ form.crime_type }}
+      {% if form.crime_type.errors %}<div class="form-error">{{ form.crime_type.errors.0 }}</div>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.title.id_for_label }}">Report title</label>
+      {{ form.title }}
+      {% if form.title.errors %}<div class="form-error">{{ form.title.errors.0 }}</div>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }}
+      <div class="form-hint">Say what happened, how it happened and who was involved.</div>
+      {% if form.description.errors %}<div class="form-error">{{ form.description.errors.0 }}</div>{% endif %}
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label" for="{{ form.incident_date.id_for_label }}">Incident date</label>
+        {{ form.incident_date }}
+        {% if form.incident_date.errors %}<div class="form-error">{{ form.incident_date.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.incident_time.id_for_label }}">Incident time <span class="opt">(optional)</span></label>
+        {{ form.incident_time }}
+        {% if form.incident_time.errors %}<div class="form-error">{{ form.incident_time.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Location</h2>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.location.id_for_label }}">Street, area or landmark</label>
+      {{ form.location }}
+      {% if form.location.errors %}<div class="form-error">{{ form.location.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label class="form-label" for="{{ form.city.id_for_label }}">City</label>
+        {{ form.city }}
+        {% if form.city.errors %}<div class="form-error">{{ form.city.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.state.id_for_label }}">State</label>
+        {{ form.state }}
+        {% if form.state.errors %}<div class="form-error">{{ form.state.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.pincode.id_for_label }}">Pincode <span class="opt">(optional)</span></label>
+        {{ form.pincode }}
+        {% if form.pincode.errors %}<div class="form-error">{{ form.pincode.errors.0 }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Suspect information <span class="opt" style="font-weight:400;color:var(--muted);">(optional)</span></h2>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.suspect_name.id_for_label }}">Suspect name</label>
+      {{ form.suspect_name }}
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.suspect_desc.id_for_label }}">Suspect description</label>
+      {{ form.suspect_desc }}
+      <div class="form-hint">Physical features, clothing, vehicle and anything else that helps identify them.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Evidence <span class="opt" style="font-weight:400;color:var(--muted);">(optional)</span></h2>
+    <div class="form-group">
+      <label class="form-label" for="{{ form.evidence_image.id_for_label }}">Photo</label>
+      {{ form.evidence_image }}
+      <div class="form-hint">JPG or PNG image.</div>
+      {% if form.evidence_image.errors %}<div class="form-error">{{ form.evidence_image.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-grow">Submit report</button>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}

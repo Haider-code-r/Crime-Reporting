@@ -1,0 +1,41 @@
+{% extends "reports/base.html" %}
+{% block title %}Police login — CrimeReport Portal{% endblock %}
+
+{% block body %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-band">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3l11 4v8c0 7-4.6 12.2-11 14C9.6 27.2 5 22 5 15V7l11-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M11 16l3.5 3.5L21 12.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <strong>Police portal</strong>
+        <span>Authorised personnel only</span>
+      </div>
+    </div>
+
+    <p class="auth-note">Accounts are created by the system administrator. If you need access, contact your administrator.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-error-box">{{ form.non_field_errors.0 }}</div>
+      {% endif %}
+      <div class="form-group">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}<div class="form-error">{{ form.username.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="form-error">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Log in to police portal</button>
+    </form>
+
+    <p class="auth-link">Not a police officer? <a href="{% url 'login' %}">Citizen login</a></p>
+  </div>
+</div>
+{% endblock %}

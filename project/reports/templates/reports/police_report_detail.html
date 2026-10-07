@@ -1,0 +1,159 @@
+{% extends "reports/base.html" %}
+{% block title %}Report {{ report.short_id }} — Police portal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Report {{ report.short_id }}</h1>
+    <p class="page-subtitle">Filed {{ report.created_at|date:"d M Y, h:i A" }}</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'police_report_list' %}" class="btn btn-outline">Back to all reports</a>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="detail-main">
+
+    <div class="card summary-strip">
+      <div class="summary-items">
+        <div class="summary-item">
+          <small>Status</small>
+          <span class="badge-status badge-lg badge-{{ report.status }}">{{ report.get_status_display }}</span>
+        </div>
+        <div class="summary-item">
+          <small>Priority</small>
+          <span class="badge-priority badge-lg badge-{{ report.priority }}">{{ report.get_priority_display }}</span>
+        </div>
+        <div class="summary-item">
+          <small>Category</small>
+          <strong>{{ report.get_crime_type_display }}</strong>
+        </div>
+      </div>
+      <div class="id-chip">{{ report.report_id }}</div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Incident details</h2>
+      <div class="detail-row">
+        <span class="detail-label">Title</span>
+        <span class="detail-val">{{ report.title }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Description</span>
+        <span class="detail-val prose">{{ report.description }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Incident date</span>
+        <span class="detail-val">{{ report.incident_date }}</span>
+      </div>
+      {% if report.incident_time %}
+      <div class="detail-row">
+        <span class="detail-label">Incident time</span>
+        <span class="detail-val">{{ report.incident_time }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Location</h2>
+      <div class="detail-row">
+        <span class="detail-label">Address</span>
+        <span class="detail-val">{{ report.location }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">City</span>
+        <span class="detail-val">{{ report.city }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">State and pincode</span>
+        <span class="detail-val">{{ report.state }}{% if report.pincode %}, {{ report.pincode }}{% endif %}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Reporter</h2>
+      <div class="detail-row">
+        <span class="detail-label">Anonymous</span>
+        <span class="detail-val">{% if report.is_anonymous %}Yes, identity hidden{% else %}No{% endif %}</span>
+      </div>
+      {% if not report.is_anonymous and report.reporter %}
+      <div class="detail-row">
+        <span class="detail-label">Name</span>
+        <span class="detail-val">{{ report.reporter.get_full_name|default:report.reporter.username }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Email</span>
+        <span class="detail-val">{{ report.reporter.email }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if report.suspect_name or report.suspect_desc %}
+    <div class="card">
+      <h2 class="card-title">Suspect information</h2>
+      {% if report.suspect_name %}
+      <div class="detail-row">
+        <span class="detail-label">Name</span>
+        <span class="detail-val">{{ report.suspect_name }}</span>
+      </div>
+      {% endif %}
+      {% if report.suspect_desc %}
+      <div class="detail-row">
+        <span class="detail-label">Description</span>
+        <span class="detail-val prose">{{ report.suspect_desc }}</span>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if report.evidence_image %}
+    <div class="card">
+      <h2 class="card-title">Evidence</h2>
+      <img src="{{ report.evidence_image.url }}" alt="Evidence photo submitted with this report" class="evidence-img"/>
+    </div>
+    {% endif %}
+
+    {% if report.admin_notes %}
+    <div class="card card-note">
+      <h2 class="card-title">Current investigation notes</h2>
+      <p class="notes-text">{{ report.admin_notes }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="detail-side">
+    <div class="card sticky-panel">
+      <h2 class="card-title">Update report</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label" for="{{ status_form.status.id_for_label }}">Status</label>
+          {{ status_form.status }}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ status_form.priority.id_for_label }}">Priority</label>
+          {{ status_form.priority }}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ status_form.admin_notes.id_for_label }}">Investigation notes</label>
+          {{ status_form.admin_notes }}
+          <div class="form-hint">Notes are visible to the reporter.</div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save changes</button>
+      </form>
+
+      <hr/>
+
+      <div class="form-hint" style="margin-top:0;">
+        {% if officer %}
+        <div>Signed in as <strong>{{ officer.get_rank_display }} {{ user.last_name }}</strong></div>
+        <div>Badge {{ officer.badge_number }}, {{ officer.station }}</div>
+        {% else %}
+        <div>Signed in as <strong>Administrator</strong></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

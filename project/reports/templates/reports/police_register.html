@@ -1,0 +1,114 @@
+{% extends "reports/base.html" %}
+{% block title %}Register police officer — CrimeReport Portal{% endblock %}
+
+{% block content %}
+<div class="narrow stack" style="max-width:760px;">
+  <div class="page-header" style="margin-bottom:0;">
+    <div>
+      <h1 class="page-title">Register police officer</h1>
+      <p class="page-subtitle">Creates the login account and the officer profile in one step. Administrators only.</p>
+    </div>
+  </div>
+
+  <form method="post" novalidate class="stack">
+    {% csrf_token %}
+
+    <div class="card">
+      <h2 class="card-title">Account</h2>
+      {% if form.non_field_errors %}
+        <div class="form-error-box">{{ form.non_field_errors.0 }}</div>
+      {% endif %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.first_name.id_for_label }}">First name</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<div class="form-error">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.last_name.id_for_label }}">Last name</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}<div class="form-error">{{ form.last_name.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Username (used to log in)</label>
+          {{ form.username }}
+          {% if form.username.errors %}<div class="form-error">{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="form-error">{{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password1.id_for_label }}">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<div class="form-error">{{ form.password1.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<div class="form-error">{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Officer details</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.badge_number.id_for_label }}">Badge or ID number</label>
+          {{ form.badge_number }}
+          {% if form.badge_number.errors %}<div class="form-error">{{ form.badge_number.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.rank.id_for_label }}">Rank</label>
+          {{ form.rank }}
+          {% if form.rank.errors %}<div class="form-error">{{ form.rank.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.station.id_for_label }}">Police station</label>
+          {{ form.station }}
+          {% if form.station.errors %}<div class="form-error">{{ form.station.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.district.id_for_label }}">District</label>
+          {{ form.district }}
+          {% if form.district.errors %}<div class="form-error">{{ form.district.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="{{ form.phone.id_for_label }}">Phone <span class="opt">(optional)</span></label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="form-error">{{ form.phone.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="{{ form.joined_date.id_for_label }}">Joining date <span class="opt">(optional)</span></label>
+          {{ form.joined_date }}
+          {% if form.joined_date.errors %}<div class="form-error">{{ form.joined_date.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-full">Register officer</button>
+  </form>
+
+  {% if officers %}
+  <div class="card">
+    <h2 class="card-title">Recently registered officers</h2>
+    {% for o in officers %}
+    <div class="officer-row">
+      <span class="badge-no cell-mono">{{ o.badge_number }}</span>
+      <span>{{ o.get_rank_display }} {{ o.user.get_full_name }}, {{ o.station }}, {{ o.district }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

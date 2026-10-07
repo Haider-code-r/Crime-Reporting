@@ -1,0 +1,98 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CrimeReport Portal{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{% static 'reports/style.css' %}"/>
+  <script>document.documentElement.className += ' js';</script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3l11 4v8c0 7-4.6 12.2-11 14C9.6 27.2 5 22 5 15V7l11-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M11 16l3.5 3.5L21 12.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      CrimeReport
+      {% if user.is_authenticated and user.police_profile %}<span class="brand-tag">Police portal</span>{% endif %}
+    </a>
+
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <svg class="icon-open" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="icon-close" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <nav class="navbar-links" id="nav-menu" aria-label="Main">
+      {% if user.is_authenticated %}
+        {% if user.police_profile %}
+          <a href="{% url 'police_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'police_dashboard' %}active{% endif %}">Dashboard</a>
+          <a href="{% url 'police_report_list' %}" class="nav-link {% if request.resolver_match.url_name == 'police_report_list' or request.resolver_match.url_name == 'police_report_detail' %}active{% endif %}">All reports</a>
+          <span class="nav-user">{{ user.police_profile.get_rank_display }} {{ user.last_name }}</span>
+          <form method="post" action="{% url 'police_logout' %}" class="nav-inline-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-btn">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">Dashboard</a>
+          <a href="{% url 'report_create' %}" class="nav-link {% if request.resolver_match.url_name == 'report_create' %}active{% endif %}">File a report</a>
+          <a href="{% url 'track' %}" class="nav-link {% if request.resolver_match.url_name == 'track' %}active{% endif %}">Track a report</a>
+          {% if user.is_superuser %}
+          <a href="{% url 'police_report_list' %}" class="nav-link {% if request.resolver_match.url_name == 'police_report_list' or request.resolver_match.url_name == 'police_report_detail' %}active{% endif %}">All reports</a>
+          <a href="{% url 'police_register' %}" class="nav-link {% if request.resolver_match.url_name == 'police_register' %}active{% endif %}">Add officer</a>
+          <a href="/admin/" class="nav-link">Admin panel</a>
+          {% endif %}
+          <span class="nav-user">{{ user.get_full_name|default:user.username }}</span>
+          <form method="post" action="{% url 'logout' %}" class="nav-inline-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-btn">Log out</button>
+          </form>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'track' %}" class="nav-link {% if request.resolver_match.url_name == 'track' %}active{% endif %}">Track a report</a>
+        <a href="{% url 'police_login' %}" class="nav-link">Police portal</a>
+        <a href="{% url 'login' %}" class="nav-btn">Log in</a>
+        <a href="{% url 'register' %}" class="nav-btn nav-btn-solid">Register</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+{% if messages %}
+<div class="messages-wrap" role="status">
+  {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% block body %}
+<main>{% block content %}{% endblock %}</main>
+{% endblock %}
+
+<footer>CrimeReport Portal &mdash; for reporting and tracking purposes only</footer>
+
+<script>
+  (function () {
+    var btn = document.querySelector('.nav-toggle');
+    var menu = document.getElementById('nav-menu');
+    if (!btn || !menu) return;
+    function setOpen(open) {
+      menu.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function () {
+      setOpen(btn.getAttribute('aria-expanded') !== 'true');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
+</script>
+</body>
+</html>

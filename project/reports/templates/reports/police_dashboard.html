@@ -1,0 +1,95 @@
+{% extends "reports/base.html" %}
+{% block title %}Police dashboard — CrimeReport Portal{% endblock %}
+
+{% block content %}
+{% if officer %}
+<section class="officer-banner" aria-label="Officer details">
+  <div class="officer-role">{{ officer.get_rank_display }}</div>
+  <div class="officer-name">{{ user.get_full_name|default:user.username }}</div>
+  <dl class="officer-meta">
+    <div><dt>Badge number</dt><dd>{{ officer.badge_number }}</dd></div>
+    <div><dt>Station</dt><dd>{{ officer.station }}</dd></div>
+    <div><dt>District</dt><dd>{{ officer.district }}</dd></div>
+    {% if officer.phone %}<div><dt>Phone</dt><dd>{{ officer.phone }}</dd></div>{% endif %}
+  </dl>
+</section>
+{% else %}
+<section class="officer-banner" aria-label="Administrator">
+  <div class="officer-role">Administrator</div>
+  <div class="officer-name">{{ user.get_full_name|default:user.username }}</div>
+</section>
+{% endif %}
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Total reports</div>
+    <div class="stat-value">{{ stats.total }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pending</div>
+    <div class="stat-value">{{ stats.pending }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Under investigation</div>
+    <div class="stat-value">{{ stats.investigating }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Resolved</div>
+    <div class="stat-value">{{ stats.resolved }}</div>
+  </div>
+  <div class="stat-card stat-critical">
+    <div class="stat-label">Critical priority</div>
+    <div class="stat-value">{{ stats.critical }}</div>
+  </div>
+</div>
+
+<div class="action-grid">
+  <a href="{% url 'police_report_list' %}" class="action-card">
+    <strong>All reports</strong>
+    <span>Review and manage every complaint.</span>
+  </a>
+  <a href="{% url 'police_report_list' %}?status=pending" class="action-card">
+    <strong>Pending reports</strong>
+    <span>Reports waiting for action.</span>
+  </a>
+  <a href="{% url 'police_report_list' %}?priority=critical" class="action-card">
+    <strong>Critical cases</strong>
+    <span>Highest priority reports.</span>
+  </a>
+</div>
+
+<div class="card card-flush">
+  <div class="card-head">
+    <h2>Recent reports</h2>
+    <a href="{% url 'police_report_list' %}">View all</a>
+  </div>
+  {% if recent %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Report ID</th><th>Type</th><th>Title</th><th>City</th><th>Filed</th><th>Status</th><th>Priority</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for r in recent %}
+        <tr>
+          <td class="cell-mono">{{ r.short_id }}</td>
+          <td class="cell-muted">{{ r.get_crime_type_display }}</td>
+          <td class="cell-title"><a href="{% url 'police_report_detail' r.pk %}">{{ r.title|truncatechars:38 }}</a></td>
+          <td class="cell-muted">{{ r.city }}</td>
+          <td class="cell-muted nowrap">{{ r.created_at|date:"d M Y" }}</td>
+          <td><span class="badge-status badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td><span class="badge-priority badge-{{ r.priority }}">{{ r.get_priority_display }}</span></td>
+          <td><a href="{% url 'police_report_detail' r.pk %}" class="btn btn-outline btn-sm">Manage</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-title">No reports yet</div>
+    <p>New reports from citizens will appear here.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "reports/base.html" %}
+{% block title %}All crime reports — Police portal{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">All crime reports</h1>
+    <p class="page-subtitle">{{ total_count }} report{{ total_count|pluralize }} found</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'police_dashboard' %}" class="btn btn-outline">Back to dashboard</a>
+  </div>
+</div>
+
+<form method="get" class="filter-bar">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search title, location, city or suspect" class="form-input search" aria-label="Search reports"/>
+  <select name="status" class="form-input form-select" aria-label="Filter by status">
+    <option value="">All statuses</option>
+    {% for val, label in status_choices %}
+      <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="crime_type" class="form-input form-select" aria-label="Filter by type">
+    <option value="">All types</option>
+    {% for val, label in type_choices %}
+      <option value="{{ val }}" {% if type_filter == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="priority" class="form-input form-select" aria-label="Filter by priority">
+    <option value="">All priorities</option>
+    {% for val, label in priority_choices %}
+      <option value="{{ val }}" {% if priority_filter == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-primary">Filter</button>
+  {% if q or status_filter or type_filter or priority_filter %}
+    <a href="{% url 'police_report_list' %}" class="btn btn-outline">Clear</a>
+  {% endif %}
+</form>
+
+{% if reports %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Report ID</th>
+        <th>Type</th>
+        <th>Title</th>
+        <th>Reporter</th>
+        <th>Location</th>
+        <th>Incident date</th>
+        <th>Filed</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td class="cell-mono">{{ r.short_id }}</td>
+        <td class="cell-muted">{{ r.get_crime_type_display }}</td>
+        <td class="cell-title"><a href="{% url 'police_report_detail' r.pk %}">{{ r.title|truncatechars:42 }}</a></td>
+        <td class="cell-muted">
+          {% if r.is_anonymous %}Anonymous
+          {% elif r.reporter %}{{ r.reporter.get_full_name|default:r.reporter.username }}
+          {% else %}&mdash;{% endif %}
+        </td>
+        <td class="cell-muted">{{ r.location|truncatechars:25 }}, {{ r.city }}</td>
+        <td class="cell-muted nowrap">{{ r.incident_date }}</td>
+        <td class="cell-muted nowrap">{{ r.created_at|date:"d M Y" }}</td>
+        <td><span class="badge-status badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+        <td><span class="badge-priority badge-{{ r.priority }}">{{ r.get_priority_display }}</span></td>
+        <td><a href="{% url 'police_report_detail' r.pk %}" class="btn btn-outline btn-sm">Manage</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-title">No reports found</div>
+  <p>{% if q or status_filter or type_filter or priority_filter %}No reports match these filters.{% else %}No crime reports have been submitted yet.{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "reports/base.html" %}
+{% block title %}Access denied — CrimeReport Portal{% endblock %}
+
+{% block body %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1 class="auth-title">Access denied</h1>
+    <p class="auth-sub">The Django admin panel is restricted to administrators. Police officers do not have access to it.</p>
+    <a href="{% url 'police_dashboard' %}" class="btn btn-primary btn-full">Go to police portal</a>
+  </div>
+</div>
+{% endblock %}
